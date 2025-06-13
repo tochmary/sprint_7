@@ -16,7 +16,7 @@ import static io.restassured.RestAssured.given;
 
 public abstract class ApiRequests {
 
-    private final RequestSpecification SPEC = new RequestSpecBuilder()
+    private final static RequestSpecification SPEC = new RequestSpecBuilder()
             .setBaseUri(URL.getHost())
             .addHeader("Content-type", "application/json")
             .setRelaxedHTTPSValidation()
@@ -26,7 +26,7 @@ public abstract class ApiRequests {
             .build();
 
     @Step("Отправить GET запрос /api/v1/ping")
-    public Response sendGetPing() {
+    public static Response sendGetPing() {
         return given()
                 .spec(SPEC)
                 .get("/api/v1/ping")
@@ -34,7 +34,7 @@ public abstract class ApiRequests {
     }
 
     @Step("Отправить POST запрос /api/v1/courier")
-    public Response sendPostRequestCreateCourier(Courier courier) {
+    public static Response sendPostRequestCreateCourier(Courier courier) {
         return given()
                 .spec(SPEC)
                 .body(courier)
@@ -43,7 +43,7 @@ public abstract class ApiRequests {
     }
 
     @Step("Отправить POST запрос /api/v1/courier/login")
-    public Response sendPostRequestLoginCourier(Courier courier) {
+    public static Response sendPostRequestLoginCourier(Courier courier) {
         return given()
                 .spec(SPEC)
                 .body(courier)
@@ -52,7 +52,7 @@ public abstract class ApiRequests {
     }
 
     @Step("Отправить DELETE запрос /api/v1/courier/{id}")
-    public Response sendPostRequestDeleteCourier(String courierId) {
+    public static Response sendPostRequestDeleteCourier(String courierId) {
         return given()
                 .spec(SPEC)
                 .pathParam("id", courierId)
@@ -61,7 +61,7 @@ public abstract class ApiRequests {
     }
 
     @Step("Отправить POST запрос /api/v1/orders")
-    public Response sendPostRequestCreateOrder(Order order) {
+    public static Response sendPostRequestCreateOrder(Order order) {
         return given()
                 .spec(SPEC)
                 .body(order)
@@ -70,7 +70,7 @@ public abstract class ApiRequests {
     }
 
     @Step("Отправить PUT запрос /api/v1/orders/accept/:id")
-    public Response sendPostRequestAcceptOrder(String orderId, String courierId) {
+    public static Response sendPostRequestAcceptOrder(String orderId, String courierId) {
         return given()
                 .spec(SPEC)
                 .pathParams("id", orderId)
@@ -80,7 +80,7 @@ public abstract class ApiRequests {
     }
 
     @Step("Отправить GET запрос /api/v1/orders")
-    public Response sendGetRequestGetOrders(Map<String, String> queryParams) {
+    public static Response sendGetRequestGetOrders(Map<String, String> queryParams) {
         return given()
                 .spec(SPEC)
                 .queryParams(queryParams)
@@ -89,7 +89,7 @@ public abstract class ApiRequests {
     }
 
     @Step("Отправить GET запрос /api/v1/orders/track")
-    public Response sendGetRequestGetOrder(Integer track) {
+    public static Response sendGetRequestGetOrder(Integer track) {
         return given()
                 .spec(SPEC)
                 .queryParam("t", track)

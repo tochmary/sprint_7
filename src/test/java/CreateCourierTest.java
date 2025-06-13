@@ -1,3 +1,4 @@
+import helpers.ApiRequests;
 import helpers.ApiSteps;
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CreateCourierTest extends ApiSteps {
+public class CreateCourierTest {
 
     Courier courier;
     Integer courierId;
@@ -27,9 +28,9 @@ public class CreateCourierTest extends ApiSteps {
             "2. Ошибок в структуре ответа нет;\n" +
             "3. Курьер добавлен.")
     public void createCourier() {
-        createCourier(courier);
+        ApiSteps.createCourier(courier);
 
-        courierId = getIdCourier(courier);
+        courierId = ApiSteps.getIdCourier(courier);
     }
 
     @Test
@@ -39,11 +40,11 @@ public class CreateCourierTest extends ApiSteps {
             "2. В ответе описание ошибки;\n" +
             "3. Курьер не добавлен.\n")
     public void createFailedSecondCourier() {
-        createCourier(courier);
+        ApiSteps.createCourier(courier);
 
-        courierId = getIdCourier(courier);
+        courierId = ApiSteps.getIdCourier(courier);
 
-        Response response = sendPostRequestCreateCourier(courier);
+        Response response = ApiRequests.sendPostRequestCreateCourier(courier);
         response.then().statusCode(409);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Этот логин уже используется",
@@ -58,7 +59,7 @@ public class CreateCourierTest extends ApiSteps {
             "3. Курьер не добавлен.\n")
     public void createFailedCourierWithoutLogin() {
         courier.setLogin(null);
-        Response response = sendPostRequestCreateCourier(courier);
+        Response response = ApiRequests.sendPostRequestCreateCourier(courier);
         response.then().statusCode(400);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Недостаточно данных для создания учетной записи",
@@ -73,7 +74,7 @@ public class CreateCourierTest extends ApiSteps {
             "3. Курьер не добавлен.\n")
     public void createFailedCourierWithoutPassword() {
         courier.setPassword(null);
-        Response response = sendPostRequestCreateCourier(courier);
+        Response response = ApiRequests.sendPostRequestCreateCourier(courier);
         response.then().statusCode(400);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Недостаточно данных для создания учетной записи",
@@ -82,6 +83,6 @@ public class CreateCourierTest extends ApiSteps {
 
     @AfterEach
     public void tearDown() {
-        if (courierId != null) deleteCourier(courierId);
+        if (courierId != null) ApiSteps.deleteCourier(courierId);
     }
 }

@@ -1,13 +1,10 @@
 package model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class RespOrder {
     RespDataOrder order;
-
-    public RespOrder(RespDataOrder order) {
-        this.order = order;
-    }
-
-    public RespDataOrder getOrder() {
-        return order;
-    }
 }

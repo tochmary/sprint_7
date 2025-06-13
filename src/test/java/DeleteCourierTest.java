@@ -1,3 +1,4 @@
+import helpers.ApiRequests;
 import helpers.ApiSteps;
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DeleteCourierTest extends ApiSteps {
+public class DeleteCourierTest {
 
     Courier courier;
     Integer courierId;
@@ -19,8 +20,8 @@ public class DeleteCourierTest extends ApiSteps {
     @BeforeEach
     public void initEach() {
         courier = new Courier("mary", "7890", "Мария");
-        createCourier(courier);
-        courierId = getIdCourier(courier);
+        ApiSteps.createCourier(courier);
+        courierId = ApiSteps.getIdCourier(courier);
     }
 
     @Test
@@ -30,8 +31,8 @@ public class DeleteCourierTest extends ApiSteps {
             "2. Ошибок в структуре ответа нет;\n" +
             "3. Курьер удален.")
     public void deleteCourier() {
-        isDelCourier = deleteCourier(courierId);
-        courierId = getNotExistIdCourier(courier);
+        isDelCourier = ApiSteps.deleteCourier(courierId);
+        courierId = ApiSteps.getNotExistIdCourier(courier);
     }
 
 
@@ -41,7 +42,7 @@ public class DeleteCourierTest extends ApiSteps {
             "1. Код и статус ответа 400 Bad Request;\n" +
             "2. В ответе описание ошибки.")
     public void deleteCourierFailedWithoutId() {
-        Response response = sendPostRequestDeleteCourier("");
+        Response response =  ApiRequests.sendPostRequestDeleteCourier("");
         response.then().statusCode(400);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Недостаточно данных для удаления курьера", respError.getMessage());
@@ -53,9 +54,9 @@ public class DeleteCourierTest extends ApiSteps {
             "1. Код и статус ответа 404 Not Found;\n" +
             "2. В ответе описание ошибки.")
     public void deleteCourierFailedWithNotExistId() {
-        isDelCourier = deleteCourier(courierId);
+        isDelCourier = ApiSteps.deleteCourier(courierId);
 
-        Response response = sendPostRequestDeleteCourier(String.valueOf(courierId));
+        Response response =  ApiRequests.sendPostRequestDeleteCourier(String.valueOf(courierId));
         response.then().statusCode(404);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Курьера с таким id нет", respError.getMessage());
@@ -63,6 +64,6 @@ public class DeleteCourierTest extends ApiSteps {
 
     @AfterEach
     public void tearDown() {
-        if (!isDelCourier) deleteCourier(courierId);
+        if (!isDelCourier) ApiSteps.deleteCourier(courierId);
     }
 }

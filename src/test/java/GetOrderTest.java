@@ -1,10 +1,10 @@
+import helpers.ApiRequests;
 import helpers.ApiSteps;
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
 import model.Order;
 import model.RespDataOrder;
 import model.RespError;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +16,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GetOrderTest extends ApiSteps {
-    public static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class GetOrderTest{
+    public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Test
     @DisplayName("Получение заказа по его номеру")
@@ -35,8 +35,8 @@ public class GetOrderTest extends ApiSteps {
                 LocalDate.now().plusDays(1).format(DATE_FORMATTER),
                 "позвонить",
                 Set.of("BLACK"));
-        Integer track = createOrder(order);
-        RespDataOrder respOrder = getOrder(track);
+        Integer track = ApiSteps.createOrder(order);
+        RespDataOrder respOrder = ApiSteps.getOrder(track);
         String expectedDate = OffsetDateTime.parse(respOrder.getDeliveryDate()).format(DATE_FORMATTER);
         assertAll("Проверка полей Order",
                 () -> assertEquals(order.getFirstName(), respOrder.getFirstName()),
@@ -57,7 +57,7 @@ public class GetOrderTest extends ApiSteps {
             "1. Код и статус ответа 400 Bad Request;\n" +
             "2. В ответе описание ошибки.")
     public void getOrderFailedWithoutTrack() {
-        Response response = sendGetRequestGetOrder(null);
+        Response response = ApiRequests.sendGetRequestGetOrder(null);
         response.then().statusCode(400);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Недостаточно данных для поиска", respError.getMessage());
@@ -69,7 +69,7 @@ public class GetOrderTest extends ApiSteps {
             "1. Код и статус ответа 404 Not Found;\n" +
             "2. В ответе описание ошибки.")
     public void getOrderFailedWithNotExistTrack() {
-        Response response = sendGetRequestGetOrder(0);
+        Response response = ApiRequests.sendGetRequestGetOrder(0);
         response.then().statusCode(404);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Заказ не найден", respError.getMessage());

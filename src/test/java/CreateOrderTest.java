@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CreateOrderTest extends ApiSteps {
-    public static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class CreateOrderTest {
+    public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private static Stream<Arguments> testColorData() {
         return Stream.of(
@@ -40,8 +40,8 @@ public class CreateOrderTest extends ApiSteps {
                 LocalDate.now().plusDays(1).format(DATE_FORMATTER),
                 "позвонить",
                 color);
-        Integer track = createOrder(order);
-        getOrder(track);
+        Integer track = ApiSteps.createOrder(order);
+        ApiSteps.getOrder(track);
     }
 
     //API Отменить заказ не работает и невозможно почистить данные, удалить заказ

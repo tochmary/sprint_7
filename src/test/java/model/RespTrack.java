@@ -1,14 +1,10 @@
 package model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class RespTrack {
-
     private Integer track;
-
-    public RespTrack(Integer track) {
-        this.track = track;
-    }
-
-    public Integer getTrack() {
-        return track;
-    }
 }

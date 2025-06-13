@@ -1,15 +1,12 @@
 package model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.util.Set;
 
+@Data
+@AllArgsConstructor
 public class RespOrders {
     Set<RespDataOrder> orders;
-
-    public RespOrders(Set<RespDataOrder> orders) {
-        this.orders = orders;
-    }
-
-    public Set<RespDataOrder> getOrders() {
-        return orders;
-    }
 }

@@ -1,14 +1,10 @@
 package model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class RespOk {
     private boolean ok;
-
-    public RespOk(boolean ok) {
-        this.ok = ok;
-    }
-
-    public boolean isOk() {
-        return ok;
-    }
-
 }

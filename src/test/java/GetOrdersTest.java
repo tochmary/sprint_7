@@ -1,7 +1,11 @@
+import helpers.ApiRequests;
 import helpers.ApiSteps;
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
-import model.*;
+import model.Courier;
+import model.Order;
+import model.RespDataOrder;
+import model.RespError;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,13 +13,16 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GetOrdersTest extends ApiSteps {
-    public static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class GetOrdersTest {
+    public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     Integer courierId;
     Integer orderId;
@@ -24,8 +31,8 @@ public class GetOrdersTest extends ApiSteps {
     @BeforeEach
     public void initEach() {
         Courier courier = new Courier("mary", "7890", "Мария");
-        createCourier(courier);
-        courierId = getIdCourier(courier);
+        ApiSteps.createCourier(courier);
+        courierId = ApiSteps.getIdCourier(courier);
         Order order = new Order("Марианна",
                 "Ларионова",
                 "Тверская",
@@ -35,8 +42,8 @@ public class GetOrdersTest extends ApiSteps {
                 LocalDate.now().plusDays(1).format(DATE_FORMATTER),
                 "позвонить",
                 Set.of("BLACK"));
-        Integer track = createOrder(order);
-        orderId = getOrder(track).getId();
+        Integer track = ApiSteps.createOrder(order);
+        orderId = ApiSteps.getOrder(track).getId();
     }
 
     @Test
@@ -47,7 +54,7 @@ public class GetOrdersTest extends ApiSteps {
             "3. Список заказов не пуст.")
     public void getOrders() {
         Map<String, String> queryParams = new HashMap<>();
-        Set<RespDataOrder> respOrders = getOrders(queryParams);
+        Set<RespDataOrder> respOrders = ApiSteps.getOrders(queryParams);
         assertFalse(respOrders.isEmpty());
     }
 
@@ -60,7 +67,7 @@ public class GetOrdersTest extends ApiSteps {
     public void getOrdersEmptyWithCourier() {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("courierId", String.valueOf(courierId));
-        Set<RespDataOrder> respOrders = getOrders(queryParams);
+        Set<RespDataOrder> respOrders = ApiSteps.getOrders(queryParams);
         assertTrue(respOrders.isEmpty());
     }
 
@@ -72,10 +79,10 @@ public class GetOrdersTest extends ApiSteps {
             "2. Ошибок в структуре ответа нет;\n" +
             "3. Принятый заказ показан.")
     public void getOrdersWithCourier() {
-        acceptOrder(orderId, courierId);
+        ApiSteps.acceptOrder(orderId, courierId);
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("courierId", String.valueOf(courierId));
-        Set<RespDataOrder> respOrders = getOrders(queryParams);
+        Set<RespDataOrder> respOrders = ApiSteps.getOrders(queryParams);
         assertTrue(respOrders.stream()
                 .map(RespDataOrder::getId)
                 .anyMatch(i -> Objects.equals(i, orderId)));
@@ -88,11 +95,11 @@ public class GetOrdersTest extends ApiSteps {
             "2. Ошибок в структуре ответа нет;\n" +
             "3. Принятый заказ показан.")
     public void getOrdersWithCourierStation() {
-        acceptOrder(orderId, courierId);
+        ApiSteps.acceptOrder(orderId, courierId);
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("courierId", String.valueOf(courierId));
         queryParams.put("nearestStation", "[\"31\"]");
-        Set<RespDataOrder> respOrders = getOrders(queryParams);
+        Set<RespDataOrder> respOrders = ApiSteps.getOrders(queryParams);
         assertTrue(respOrders.stream()
                 .map(RespDataOrder::getId)
                 .anyMatch(i -> Objects.equals(i, orderId)));
@@ -104,10 +111,10 @@ public class GetOrdersTest extends ApiSteps {
             "1. Код и статус ответа 404 Not Found;\n" +
             "2. В ответе описание ошибки.")
     public void getOrdersWithNotExistCourier() {
-        isDelCourier = deleteCourier(courierId);
+        isDelCourier = ApiSteps.deleteCourier(courierId);
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("courierId", String.valueOf(courierId));
-        Response response = sendGetRequestGetOrders(queryParams);
+        Response response = ApiRequests.sendGetRequestGetOrders(queryParams);
         response.then().statusCode(404);
         RespError respError = response.body().as(RespError.class);
         String expectedMsg = format("Курьер с идентификатором %s не найден", courierId);
@@ -117,6 +124,6 @@ public class GetOrdersTest extends ApiSteps {
     @AfterEach
     public void tearDown() {
         //API Отменить заказ не работает и невозможно почистить данные, удалить заказ
-        if (!isDelCourier) deleteCourier(courierId);
+        if (!isDelCourier) ApiSteps.deleteCourier(courierId);
     }
 }

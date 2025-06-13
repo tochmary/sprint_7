@@ -1,7 +1,9 @@
 package model;
 
-import java.util.Set;
+import lombok.Data;
 
+import java.util.Set;
+@Data
 public class RespDataOrder {
     private Integer id;
     private String firstName;
@@ -21,52 +23,4 @@ public class RespDataOrder {
     private String courierFirstName;
     private String createdAt;
     private String updatedAt;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getMetroStation() {
-        return metroStation;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public Integer getRentTime() {
-        return rentTime;
-    }
-
-    public String getDeliveryDate() {
-        return deliveryDate;
-    }
-
-    public Set<String> getColor() {
-        return color;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public String getCourierFirstName() {
-        return courierFirstName;
-    }
 }

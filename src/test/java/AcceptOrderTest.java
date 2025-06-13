@@ -1,3 +1,4 @@
+import helpers.ApiRequests;
 import helpers.ApiSteps;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
@@ -17,8 +18,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AcceptOrderTest extends ApiSteps {
-    public static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class AcceptOrderTest {
+    public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     Courier courier;
     Integer courierId;
     Integer track;
@@ -28,8 +29,8 @@ public class AcceptOrderTest extends ApiSteps {
     @BeforeEach
     public void initEach() {
         courier = new Courier("mary", "7890", "Мария");
-        createCourier(courier);
-        courierId = getIdCourier(courier);
+        ApiSteps.createCourier(courier);
+        courierId = ApiSteps.getIdCourier(courier);
         Order order = new Order("Марианна",
                 "Ларионова",
                 "Тверская",
@@ -39,8 +40,8 @@ public class AcceptOrderTest extends ApiSteps {
                 LocalDate.now().plusDays(1).format(DATE_FORMATTER),
                 "позвонить",
                 Set.of("BLACK"));
-        track = createOrder(order);
-        orderId = getOrder(track).getId();
+        track = ApiSteps.createOrder(order);
+        orderId = ApiSteps.getOrder(track).getId();
     }
 
     @Test
@@ -50,7 +51,7 @@ public class AcceptOrderTest extends ApiSteps {
             "2. Ошибок в структуре ответа нет;\n" +
             "3. Заказ принят.")
     public void acceptOrder() {
-        acceptOrder(orderId, courierId);
+        ApiSteps.acceptOrder(orderId, courierId);
         checkStatusAccept(track);
     }
 
@@ -61,7 +62,7 @@ public class AcceptOrderTest extends ApiSteps {
             "2. В ответе описание ошибки;\n" +
             "3. Заказ не принят.")
     public void acceptOrderFailedWithoutCourierId() {
-        Response response = sendPostRequestAcceptOrder(String.valueOf(orderId), "");
+        Response response = ApiRequests.sendPostRequestAcceptOrder(String.valueOf(orderId), "");
         response.then().statusCode(400);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Недостаточно данных для поиска", respError.getMessage());
@@ -75,7 +76,7 @@ public class AcceptOrderTest extends ApiSteps {
             "2. В ответе описание ошибки;\n" +
             "3. Заказ не принят.")
     public void acceptOrderFailedWithoutOrderId() {
-        Response response = sendPostRequestAcceptOrder("", String.valueOf(courierId));
+        Response response = ApiRequests.sendPostRequestAcceptOrder("", String.valueOf(courierId));
         response.then().statusCode(400);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Недостаточно данных для поиска", respError.getMessage());
@@ -89,8 +90,8 @@ public class AcceptOrderTest extends ApiSteps {
             "2. В ответе описание ошибки;\n" +
             "3. Заказ не принят.")
     public void acceptOrderFailedWithNotExistCourierId() {
-        isDelCourier = deleteCourier(courierId);
-        Response response = sendPostRequestAcceptOrder(String.valueOf(orderId), String.valueOf(courierId));
+        isDelCourier = ApiSteps.deleteCourier(courierId);
+        Response response = ApiRequests.sendPostRequestAcceptOrder(String.valueOf(orderId), String.valueOf(courierId));
         response.then().statusCode(404);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Курьера с таким id не существует", respError.getMessage());
@@ -104,7 +105,7 @@ public class AcceptOrderTest extends ApiSteps {
             "2. В ответе описание ошибки;\n" +
             "3. Заказ не принят.")
     public void acceptOrderFailedNotExistOrderId() {
-        Response response = sendPostRequestAcceptOrder("0", String.valueOf(courierId));
+        Response response = ApiRequests.sendPostRequestAcceptOrder("0", String.valueOf(courierId));
         response.then().statusCode(404);
         RespError respError = response.body().as(RespError.class);
         assertEquals("Заказа с таким id не существует", respError.getMessage());
@@ -113,14 +114,14 @@ public class AcceptOrderTest extends ApiSteps {
 
     @Step("Проверка статуса заказа - принят курьером")
     private void checkStatusAccept(Integer track) {
-        RespDataOrder respOrder = getOrder(track);
+        RespDataOrder respOrder = ApiSteps.getOrder(track);
         assertEquals(1, respOrder.getStatus(), "Статус не принят!");
         assertEquals(courier.getFirstName(), respOrder.getCourierFirstName(), "Курьер не назначат!");
     }
 
     @Step("Проверка статуса заказа - не принят курьером")
     private void checkStatusNoAccept(Integer track) {
-        RespDataOrder respOrder = getOrder(track);
+        RespDataOrder respOrder = ApiSteps.getOrder(track);
         assertEquals(0, respOrder.getStatus(), "Статус принят!");
         assertNull(respOrder.getCourierFirstName(), "Курьер назначат!");
     }
@@ -128,6 +129,6 @@ public class AcceptOrderTest extends ApiSteps {
     @AfterEach
     public void tearDown() {
         //API Отменить заказ не работает и невозможно почистить данные, удалить заказ
-        if (!isDelCourier) deleteCourier(courierId);
+        if (!isDelCourier) ApiSteps.deleteCourier(courierId);
     }
 }
